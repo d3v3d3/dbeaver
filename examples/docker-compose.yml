@@ -1,0 +1,32 @@
+version: "3.7"
+
+services:
+  dbeaver:
+    image: d3v3d3/dbeaver
+    network_mode: "service:vpn"
+    depends_on: 
+      - vpn
+    environment:
+      - DISPLAY=host.docker.internal:0
+    volumes:
+      - ./.local:/root/.local
+      - /tmp/.X11-unix:/tmp/.X11-unix
+      - ~/.ssh/id_rsa.pub:/root/.ssh/id_rsa.pub
+      - ~/.ssh/id_rsa:/root/.ssh/id_rsa
+  vpn:
+    image: d3v3d3/ipsec-vpn-client
+    environment:
+      - VPN_PUBLIC_IP=YOUR_VPN_PUBLIC_IP
+      - VPN_IPSEC_PSK=YOUR_VPN_SECRET
+      - VPN_USER=YOUR_VPN_ACCOUNT_USERNAME
+      - VPN_PASSWORD=YOUR_VPN_ACCOUNT_PASSWORD
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/ppp
+      - /dev/net/tun
+    networks:
+      - vpn
+
+networks:
+  vpn:
